@@ -10,15 +10,17 @@ package searcher;
  * @author fauricio
  */
 public class SearchInformation {
+    public String word;
     public String webSite;
     public String header;
-    public long time;
     public int appearances;
+    public long time;
 
-    public SearchInformation(String webSite, String header, long time, int appearances) {
+    public SearchInformation(String word, String webSite, String header, int appearances, long time) {
+        this.word = word;
         this.webSite = webSite;
         this.header = header;
-        this.time = time;
         this.appearances = appearances;
+        this.time = time;
     }
 }

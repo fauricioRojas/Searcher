@@ -10,5 +10,9 @@ package searcher.Sequential;
  * @author Kenneth Pérez
  */
 public class searchSequential {
+
+    public searchSequential() {
+    }
+    
     
 }

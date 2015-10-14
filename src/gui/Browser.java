@@ -14,7 +14,6 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,7 +38,6 @@ public class Browser extends javax.swing.JFrame {
         myStatistics = new Statistics();
         setMargin();
         selectSequential();
-        buttonStatistics.setEnabled(false);
     }
     
     public void setMargin() {
@@ -63,6 +61,11 @@ public class Browser extends javax.swing.JFrame {
         buttonParallel.setBackground(new java.awt.Color(231, 76, 60));
     }
     
+    public void selectParallel() {
+        buttonSequential.setBackground(new java.awt.Color(231, 76, 60));
+        buttonParallel.setBackground(new java.awt.Color(0, 178, 118));
+    }
+    
     public int getTotalAppearances(String content, String word) {
         int appearances = 0;
         
@@ -77,11 +80,24 @@ public class Browser extends javax.swing.JFrame {
         return appearances;
     }
     
+    
+    public void showResults(ArrayList<SearchInformation> arrayInformation) {
+        textAreaResults.append(arrayInformation.size() + " results found (" + getTotalTime(arrayInformation) + " seconds)\n\n");
+                        
+        for (SearchInformation searchInformation : arrayInformation) {
+            textAreaResults.append(searchInformation.word + "\n");
+            textAreaResults.append(searchInformation.header + "\n");
+            textAreaResults.append(searchInformation.webSite + "\n");
+            textAreaResults.append(searchInformation.appearances + " appearances\n");
+            textAreaResults.append(searchInformation.time + " seconds\n\n");
+        }
+    }
+    
     public double getTotalTime(ArrayList<SearchInformation> arrayInformation) {
         double totalTime = 0;
         
-        for(int i=0; i<arrayInformation.size(); i++) {
-            totalTime += arrayInformation.get(i).time;
+        for (SearchInformation searchInformation : arrayInformation) {
+            totalTime += searchInformation.time;
         }
         
         return totalTime;
@@ -144,7 +160,7 @@ public class Browser extends javax.swing.JFrame {
                 int appearances = getTotalAppearances(content, arrayWords.get(i));
                 if(appearances > 0) {
                     long totalTime = System.currentTimeMillis() - time;
-                    mySearchInformation = new SearchInformation(webSites[x], firstLine, totalTime/1000, appearances);
+                    mySearchInformation = new SearchInformation(arrayWords.get(i), webSites[x], firstLine, appearances, totalTime/1000);
                     arrayInformation.add(mySearchInformation);
                 }    
             }
@@ -350,6 +366,7 @@ public class Browser extends javax.swing.JFrame {
         buttonStatistics.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         buttonStatistics.setText("See statistics");
         buttonStatistics.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        buttonStatistics.setEnabled(false);
         buttonStatistics.setPreferredSize(new java.awt.Dimension(150, 30));
         buttonStatistics.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -512,14 +529,12 @@ public class Browser extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void buttonSequentialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSequentialActionPerformed
-        buttonSequential.setBackground(new java.awt.Color(0, 178, 118));
-        buttonParallel.setBackground(new java.awt.Color(231, 76, 60));
+        selectSequential();
         myStatistics.textExecutionType.setText("Sequential");
     }//GEN-LAST:event_buttonSequentialActionPerformed
 
     private void buttonParallelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonParallelActionPerformed
-        buttonSequential.setBackground(new java.awt.Color(231, 76, 60));
-        buttonParallel.setBackground(new java.awt.Color(0, 178, 118));
+        selectParallel();
         myStatistics.textExecutionType.setText("Parallel");
     }//GEN-LAST:event_buttonParallelActionPerformed
 
@@ -531,18 +546,7 @@ public class Browser extends javax.swing.JFrame {
                 try {
                     ArrayList<SearchInformation> arrayInformation = goWebSites();
                     if(arrayInformation.size() > 0){
-                        textAreaResults.setText(arrayInformation.size() + " results found (" + getTotalTime(arrayInformation) + " seconds)\n\n");
-                        
-                        for(int i=0; i<arrayInformation.size(); i++) {
-                            String results = textAreaResults.getText(), result = "";
-                            
-                            result += arrayInformation.get(i).header + "\n";
-                            result += arrayInformation.get(i).webSite + "\n";
-                            result += arrayInformation.get(i).appearances + " appearances\n";
-                            result += arrayInformation.get(i).time + " seconds\n\n";
-                            
-                            textAreaResults.setText(results + result);
-                        }
+                        showResults(arrayInformation);
                     }
                     else {
                         textAreaResults.setText("No results found.");
