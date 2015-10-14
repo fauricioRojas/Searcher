@@ -12,11 +12,13 @@ package searcher;
 public class SearchInformation {
     public String webSite;
     public String header;
-    public double time;
+    public long time;
+    public int appearances;
 
-    public SearchInformation(String webSite, String header, double time) {
+    public SearchInformation(String webSite, String header, long time, int appearances) {
         this.webSite = webSite;
         this.header = header;
         this.time = time;
+        this.appearances = appearances;
     }
 }

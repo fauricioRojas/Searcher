@@ -15,6 +15,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
@@ -62,6 +63,20 @@ public class Browser extends javax.swing.JFrame {
         buttonParallel.setBackground(new java.awt.Color(231, 76, 60));
     }
     
+    public int getTotalAppearances(String content, String word) {
+        int appearances = 0;
+        
+        StringTokenizer wordsContent = new StringTokenizer(content, " \n<>&¿?@=¡!|^{}[]*~'&%#\";:/-_°¬+,.\\()");
+        
+        while(wordsContent.hasMoreTokens()){
+            if(wordsContent.nextToken().equals(word)) {
+                appearances++;
+            }
+        }
+        
+        return appearances;
+    }
+    
     public double getTotalTime(ArrayList<SearchInformation> arrayInformation) {
         double totalTime = 0;
         
@@ -107,9 +122,8 @@ public class Browser extends javax.swing.JFrame {
         
         String webSites[] = getWebSites();
         for(int x=0; x<webSites.length; x++) {
-            Calendar now = Calendar.getInstance();
-            long time = now.getTimeInMillis();
-        
+            long time = System.currentTimeMillis();
+            
             URL url = new URL(webSites[x]);
             URLConnection uc = url.openConnection();
             uc.connect();
@@ -127,13 +141,11 @@ public class Browser extends javax.swing.JFrame {
             in.close();
             
             for(int i=0; i<arrayWords.size(); i++) {
-                if(content.contains(arrayWords.get(i))) {
-                    String timeSeconds = String.valueOf((double)time/1000);
-                    timeSeconds = timeSeconds.substring(0,5);
-                    
-                    mySearchInformation = new SearchInformation(webSites[x], firstLine, Double.parseDouble(timeSeconds));
+                int appearances = getTotalAppearances(content, arrayWords.get(i));
+                if(appearances > 0) {
+                    long totalTime = System.currentTimeMillis() - time;
+                    mySearchInformation = new SearchInformation(webSites[x], firstLine, totalTime/1000, appearances);
                     arrayInformation.add(mySearchInformation);
-                    break;
                 }    
             }
             
@@ -526,6 +538,7 @@ public class Browser extends javax.swing.JFrame {
                             
                             result += arrayInformation.get(i).header + "\n";
                             result += arrayInformation.get(i).webSite + "\n";
+                            result += arrayInformation.get(i).appearances + " appearances\n";
                             result += arrayInformation.get(i).time + " seconds\n\n";
                             
                             textAreaResults.setText(results + result);
