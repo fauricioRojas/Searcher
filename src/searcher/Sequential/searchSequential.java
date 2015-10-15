@@ -30,9 +30,7 @@ public class searchSequential {
      * @return Array with information of the search in the web sites
      * @throws IOException 
      */
-    public ArrayList<SearchInformation> searchSequential() throws IOException {
-        // This array contains the words to search in the web sites
-        ArrayList<String> arrayWords = this.myFacilitator.getWordsToSearch();
+    public ArrayList<SearchInformation> searchSequential(ArrayList<String> arrayWords, ArrayList<String> webSites) throws IOException {
         // This array contains the information for show in the statistics
         ArrayList<SearchInformation> arrayInformation = new ArrayList();
         // This object contains the information
@@ -40,7 +38,6 @@ public class searchSequential {
         
         boolean readyTitle = false;
         
-        ArrayList<String> webSites = this.myFacilitator.getWebSites();
         for (String webSite : webSites) {
             URL url = new URL(webSite);
             URLConnection uc = url.openConnection();
@@ -49,7 +46,7 @@ public class searchSequential {
             String line, title = "", content = "";
             while ((line = in.readLine()) != null) {
                 if(line.contains("<title>") && !readyTitle) {
-                    title = line.substring(line.indexOf("<title>")+7, line.indexOf("</title>"));;
+                    title = line.substring(line.indexOf("<title>")+7, line.indexOf("</title>"));
                     readyTitle = true;
                 }
                 

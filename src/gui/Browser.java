@@ -5,18 +5,26 @@
  */
 package gui;
 
+import java.awt.Desktop;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JFileChooser;
 import javax.swing.border.Border;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import searcher.Facilitator;
+import searcher.Parallel.searchParallel;
 import searcher.SearchInformation;
 import searcher.Sequential.searchSequential;
 
@@ -41,6 +49,21 @@ public class Browser extends javax.swing.JFrame {
         
         setMargin();
         selectSequential();
+        
+        textAreaResults.setEditable(false);
+    textAreaResults.setContentType("text/html");
+    textAreaResults.addHyperlinkListener(new HyperlinkListener() {
+        @Override
+        public void hyperlinkUpdate(HyperlinkEvent e) {
+            if(e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                Desktop desktop = Desktop.getDesktop();
+                try {
+                    desktop.browse(e.getURL().toURI());
+                } catch (URISyntaxException | IOException ex) {
+                }
+            }
+        }
+    });
     }
     
     /**
@@ -84,22 +107,37 @@ public class Browser extends javax.swing.JFrame {
             
             if(buttonSequential.getBackground().getRed() == 0) { // Sequential
                 try {
+                    ArrayList<String> arrayWords = myFacilitator.getWordsToSearch();
+                    ArrayList<String> webSites = myFacilitator.getWebSites();
+                    
                     double time = System.currentTimeMillis();
-                    ArrayList<SearchInformation> arrayInformation = this.mySequential.searchSequential();
+                    ArrayList<SearchInformation> arrayInformation = this.mySequential.searchSequential(arrayWords, webSites);
                     double totalTime = (System.currentTimeMillis() - time)/1000;
                     
                     if(arrayInformation.size() > 0){
                         myFacilitator.showResults(arrayInformation, totalTime);
                     }
                     else {
-                        textAreaResults.setText("No results found.");
+                        textAreaResults.setText("<div style='font-family: Arial, Helvetica, sans-serif; font-size: 12px;'>No results found.</div>");
                     }
                 } catch (IOException ex) {
                     Logger.getLogger(Browser.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            else { // Parallel
-
+            else 
+            { // Parallel
+                searchParallel search_parallel = new searchParallel(myFacilitator.getWordsToSearch(), myFacilitator.getWebSites());
+                
+                double time = System.currentTimeMillis();                
+                ArrayList<SearchInformation> arrayInformation = search_parallel.search();
+                double totalTime = (System.currentTimeMillis() - time)/1000;
+                
+                if(arrayInformation.size() > 0){
+                    myFacilitator.showResults(arrayInformation, totalTime);
+                }
+                else {
+                    textAreaResults.setText("<div style='font-family: Arial, Helvetica, sans-serif; font-size: 12px;'>No results found.</div>");
+                }
             }
 
             buttonStatistics.setEnabled(true);
@@ -130,8 +168,8 @@ public class Browser extends javax.swing.JFrame {
         jButton3 = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        textAreaResults = new javax.swing.JTextArea();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        textAreaResults = new javax.swing.JTextPane();
         jPanel6 = new javax.swing.JPanel();
         buttonStatistics = new javax.swing.JButton();
         buttonSearch = new javax.swing.JButton();
@@ -267,11 +305,7 @@ public class Browser extends javax.swing.JFrame {
         jLabel4.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         jLabel4.setText("Search results");
 
-        textAreaResults.setEditable(false);
-        textAreaResults.setColumns(20);
-        textAreaResults.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        textAreaResults.setRows(5);
-        jScrollPane2.setViewportView(textAreaResults);
+        jScrollPane3.setViewportView(textAreaResults);
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -283,7 +317,7 @@ public class Browser extends javax.swing.JFrame {
                 .addGap(258, 258, 258))
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2)
+                .addComponent(jScrollPane3)
                 .addContainerGap())
         );
         jPanel5Layout.setVerticalGroup(
@@ -292,8 +326,8 @@ public class Browser extends javax.swing.JFrame {
                 .addGap(20, 20, 20)
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 531, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jScrollPane3)
+                .addContainerGap())
         );
 
         jPanel6.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -354,7 +388,7 @@ public class Browser extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel5)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
                 .addComponent(textSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -546,9 +580,9 @@ public class Browser extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     public javax.swing.JTextArea textAreaPages;
-    public javax.swing.JTextArea textAreaResults;
+    public javax.swing.JTextPane textAreaResults;
     public javax.swing.JTextField textSearch;
     // End of variables declaration//GEN-END:variables
 }
