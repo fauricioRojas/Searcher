@@ -62,9 +62,9 @@ public class searchSequential {
             for (String arrayWord : arrayWords) {
                 int appearances = this.myFacilitator.getTotalAppearances(content, arrayWord);
                 if (appearances > 0) {
-                    double totalTime = System.currentTimeMillis() - time;
+                    double totalTime = (System.currentTimeMillis() - time)/1000;
                     
-                    mySearchInformation = new SearchInformation(arrayWord, webSite, title, appearances, totalTime/1000);
+                    mySearchInformation = new SearchInformation(arrayWord, webSite, title, appearances, totalTime);
                     arrayInformation.add(mySearchInformation);
                 }    
             }

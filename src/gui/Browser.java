@@ -84,9 +84,12 @@ public class Browser extends javax.swing.JFrame {
             
             if(buttonSequential.getBackground().getRed() == 0) { // Sequential
                 try {
+                    double time = System.currentTimeMillis();
                     ArrayList<SearchInformation> arrayInformation = this.mySequential.searchSequential();
+                    double totalTime = (System.currentTimeMillis() - time)/1000;
+                    
                     if(arrayInformation.size() > 0){
-                        myFacilitator.showResults(arrayInformation);
+                        myFacilitator.showResults(arrayInformation, totalTime);
                     }
                     else {
                         textAreaResults.setText("No results found.");

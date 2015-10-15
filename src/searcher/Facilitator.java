@@ -45,9 +45,10 @@ public class Facilitator {
     /**
      * This method shows the results of the search
      * @param arrayInformation Array with the information of the search
+     * @param totalTime Total time of the search
      */
-    public void showResults(ArrayList<SearchInformation> arrayInformation) {
-        this.myBrowser.textAreaResults.append(arrayInformation.size() + " results found (" + getTotalTime(arrayInformation) + " seconds)");
+    public void showResults(ArrayList<SearchInformation> arrayInformation, double totalTime) {
+        this.myBrowser.textAreaResults.append(arrayInformation.size() + " results found (" + totalTime + " seconds)");
                         
         for (SearchInformation searchInformation : arrayInformation) {
             this.myBrowser.textAreaResults.append("\n\n" + searchInformation.word + "\n");
@@ -56,21 +57,6 @@ public class Facilitator {
             this.myBrowser.textAreaResults.append(searchInformation.appearances + " appearances\n");
             this.myBrowser.textAreaResults.append(searchInformation.time + " seconds");
         }
-    }
-    
-    /**
-     * This method get the total time of the search
-     * @param arrayInformation Array with the information of the search
-     * @return Total time
-     */
-    public double getTotalTime(ArrayList<SearchInformation> arrayInformation) {
-        double totalTime = 0;
-        
-        for (SearchInformation searchInformation : arrayInformation) {
-            totalTime += searchInformation.time;
-        }
-        
-        return totalTime;
     }
     
     /**
