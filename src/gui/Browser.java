@@ -23,6 +23,7 @@ import javax.swing.JFileChooser;
 import javax.swing.border.Border;
 import searcher.Facilitator;
 import searcher.SearchInformation;
+import searcher.Sequential.searchSequential;
 
 /**
  *
@@ -30,7 +31,8 @@ import searcher.SearchInformation;
  */
 public class Browser extends javax.swing.JFrame {
     private Statistics myStatistics;
-    private Facilitator myFacilitator; 
+    private Facilitator myFacilitator;
+    private searchSequential mySequential;
     
     /**
      * Creates new form browser
@@ -38,8 +40,10 @@ public class Browser extends javax.swing.JFrame {
     public Browser() {
         initComponents();
         setLocationRelativeTo(null);
-        myFacilitator = new Facilitator(this);
-        myStatistics = new Statistics();
+        this.myFacilitator = new Facilitator(this);
+        this.myStatistics = new Statistics();
+        this.mySequential = new searchSequential(myFacilitator);
+        
         setMargin();
         selectSequential();
     }
@@ -79,51 +83,29 @@ public class Browser extends javax.swing.JFrame {
         buttonParallel.setBackground(new java.awt.Color(0, 178, 118));
     }
     
-    /**
-     * This method get the content for a web sites and search if a word exists in the content of the web site
-     * @return Array with information of the search in the web sites
-     * @throws IOException 
-     */
-    public ArrayList<SearchInformation> goWebSites() throws IOException {
-        // This array contains the words to search in the web sites
-        ArrayList<String> arrayWords = myFacilitator.getWordsToSearch();
-        // This array contains the information for show in the statistics
-        ArrayList<SearchInformation> arrayInformation = new ArrayList();
-        // This object contains the information
-        SearchInformation mySearchInformation;
-        
-        boolean ready = false;
-        
-        ArrayList<String> webSites = myFacilitator.getWebSites();
-        for (String webSite : webSites) {
-            URL url = new URL(webSite);
-            URLConnection uc = url.openConnection();
-            uc.connect();
-            BufferedReader in = new BufferedReader(new InputStreamReader(uc.getInputStream()));
-            String line, firstLine = "", content = "";
-            while ((line = in.readLine()) != null) {
-                if(line.contains("<p>") && !ready) {
-                    firstLine = line;
-                    ready = true;
+    public void search() {
+        if(!textSearch.getText().equals("") && !textAreaPages.getText().equals("")) {
+            textAreaResults.setText("");
+            
+            if(buttonSequential.getBackground().getRed() == 0) { // Sequential
+                try {
+                    ArrayList<SearchInformation> arrayInformation = this.mySequential.goWebSites();
+                    if(arrayInformation.size() > 0){
+                        myFacilitator.showResults(arrayInformation);
+                    }
+                    else {
+                        textAreaResults.setText("No results found.");
+                    }
+                } catch (IOException ex) {
+                    Logger.getLogger(Browser.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                content += line;
             }
-            in.close();
-            
-            double time = System.currentTimeMillis();
-            
-            for (String arrayWord : arrayWords) {
-                int appearances = myFacilitator.getTotalAppearances(content, arrayWord);
-                if (appearances > 0) {
-                    double totalTime = System.currentTimeMillis() - time;
-                    mySearchInformation = new SearchInformation(arrayWord, webSite, firstLine, appearances, totalTime/1000);
-                    arrayInformation.add(mySearchInformation);
-                }    
+            else { // Parallel
+
             }
-            ready = false;
+
+            buttonStatistics.setEnabled(true);
         }
-        
-        return arrayInformation;
     }
     
     /**
@@ -344,6 +326,11 @@ public class Browser extends javax.swing.JFrame {
 
         textSearch.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         textSearch.setPreferredSize(new java.awt.Dimension(360, 25));
+        textSearch.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                textSearchKeyTyped(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
@@ -493,33 +480,18 @@ public class Browser extends javax.swing.JFrame {
     }//GEN-LAST:event_buttonParallelActionPerformed
 
     private void buttonSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSearchActionPerformed
-        if(!textSearch.getText().equals("") && !textAreaPages.getText().equals("")) {
-            textAreaResults.setText("");
-            
-            if(buttonSequential.getBackground().getRed() == 0) { // Sequential
-                try {
-                    ArrayList<SearchInformation> arrayInformation = goWebSites();
-                    if(arrayInformation.size() > 0){
-                        myFacilitator.showResults(arrayInformation);
-                    }
-                    else {
-                        textAreaResults.setText("No results found.");
-                    }
-                } catch (IOException ex) {
-                    Logger.getLogger(Browser.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-            else { // Parallel
-
-            }
-
-            buttonStatistics.setEnabled(true);
-        }
+        search();
     }//GEN-LAST:event_buttonSearchActionPerformed
 
     private void buttonStatisticsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonStatisticsActionPerformed
         myStatistics.setVisible(true);
     }//GEN-LAST:event_buttonStatisticsActionPerformed
+
+    private void textSearchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_textSearchKeyTyped
+        if(evt.getKeyChar() == '\n'){
+            search();
+        }
+    }//GEN-LAST:event_textSearchKeyTyped
 
     /**
      * @param args the command line arguments
