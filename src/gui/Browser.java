@@ -14,12 +14,14 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JFileChooser;
 import javax.swing.border.Border;
+import searcher.Facilitator;
 import searcher.SearchInformation;
 
 /**
@@ -27,7 +29,8 @@ import searcher.SearchInformation;
  * @author fauricio
  */
 public class Browser extends javax.swing.JFrame {
-    public Statistics myStatistics;
+    private Statistics myStatistics;
+    private Facilitator myFacilitator; 
     
     /**
      * Creates new form browser
@@ -35,11 +38,15 @@ public class Browser extends javax.swing.JFrame {
     public Browser() {
         initComponents();
         setLocationRelativeTo(null);
+        myFacilitator = new Facilitator(this);
         myStatistics = new Statistics();
         setMargin();
         selectSequential();
     }
     
+    /**
+     * This method set margin to the text input
+     */
     public void setMargin() {
         Border border = BorderFactory.createLineBorder(textAreaPages.getBackground());
         textAreaPages.setBorder(BorderFactory.createCompoundBorder(border, 
@@ -56,79 +63,30 @@ public class Browser extends javax.swing.JFrame {
             BorderFactory.createEmptyBorder(0, 5, 0, 5)));
     }
     
+    /**
+     * This method change the color of the type execution's type buttons
+     */
     public void selectSequential() {
         buttonSequential.setBackground(new java.awt.Color(0, 178, 118));
         buttonParallel.setBackground(new java.awt.Color(231, 76, 60));
     }
     
+    /**
+     * This method change the color of the type execution's type buttons
+     */
     public void selectParallel() {
         buttonSequential.setBackground(new java.awt.Color(231, 76, 60));
         buttonParallel.setBackground(new java.awt.Color(0, 178, 118));
     }
     
-    public int getTotalAppearances(String content, String word) {
-        int appearances = 0;
-        
-        StringTokenizer wordsContent = new StringTokenizer(content, " \n<>&¿?@=¡!|^{}[]*~'&%#\";:/-_°¬+,.\\()");
-        
-        while(wordsContent.hasMoreTokens()){
-            if(wordsContent.nextToken().equals(word)) {
-                appearances++;
-            }
-        }
-        
-        return appearances;
-    }
-    
-    
-    public void showResults(ArrayList<SearchInformation> arrayInformation) {
-        textAreaResults.append(arrayInformation.size() + " results found (" + getTotalTime(arrayInformation) + " seconds)\n\n");
-                        
-        for (SearchInformation searchInformation : arrayInformation) {
-            textAreaResults.append(searchInformation.word + "\n");
-            textAreaResults.append(searchInformation.header + "\n");
-            textAreaResults.append(searchInformation.webSite + "\n");
-            textAreaResults.append(searchInformation.appearances + " appearances\n");
-            textAreaResults.append(searchInformation.time + " seconds\n\n");
-        }
-    }
-    
-    public double getTotalTime(ArrayList<SearchInformation> arrayInformation) {
-        double totalTime = 0;
-        
-        for (SearchInformation searchInformation : arrayInformation) {
-            totalTime += searchInformation.time;
-        }
-        
-        return totalTime;
-    }
-    
-    public ArrayList<String> getWordsToSearch() {
-        ArrayList<String> arrayWords = new ArrayList();
-        String stringSearch = textSearch.getText().replace(" | ","|"), word = "";
-        
-        for(int i=0; i<stringSearch.length(); i++) {
-            if(stringSearch.charAt(i) != '|') {
-                word += stringSearch.charAt(i);
-            }
-            else {
-                arrayWords.add(word);
-                word = "";
-            }
-        }
-        arrayWords.add(word);
-        
-        return arrayWords;
-    }
-    
-    public String[] getWebSites() {
-        return textAreaPages.getText().split("\\n");
-        
-    }
-    
+    /**
+     * This method get the content for a web sites and search if a word exists in the content of the web site
+     * @return Array with information of the search in the web sites
+     * @throws IOException 
+     */
     public ArrayList<SearchInformation> goWebSites() throws IOException {
         // This array contains the words to search in the web sites
-        ArrayList<String> arrayWords = getWordsToSearch();
+        ArrayList<String> arrayWords = myFacilitator.getWordsToSearch();
         // This array contains the information for show in the statistics
         ArrayList<SearchInformation> arrayInformation = new ArrayList();
         // This object contains the information
@@ -136,17 +94,13 @@ public class Browser extends javax.swing.JFrame {
         
         boolean ready = false;
         
-        String webSites[] = getWebSites();
-        for(int x=0; x<webSites.length; x++) {
-            long time = System.currentTimeMillis();
-            
-            URL url = new URL(webSites[x]);
+        ArrayList<String> webSites = myFacilitator.getWebSites();
+        for (String webSite : webSites) {
+            URL url = new URL(webSite);
             URLConnection uc = url.openConnection();
             uc.connect();
-
             BufferedReader in = new BufferedReader(new InputStreamReader(uc.getInputStream()));
             String line, firstLine = "", content = "";
-            
             while ((line = in.readLine()) != null) {
                 if(line.contains("<p>") && !ready) {
                     firstLine = line;
@@ -156,15 +110,16 @@ public class Browser extends javax.swing.JFrame {
             }
             in.close();
             
-            for(int i=0; i<arrayWords.size(); i++) {
-                int appearances = getTotalAppearances(content, arrayWords.get(i));
-                if(appearances > 0) {
-                    long totalTime = System.currentTimeMillis() - time;
-                    mySearchInformation = new SearchInformation(arrayWords.get(i), webSites[x], firstLine, appearances, totalTime/1000);
+            double time = System.currentTimeMillis();
+            
+            for (String arrayWord : arrayWords) {
+                int appearances = myFacilitator.getTotalAppearances(content, arrayWord);
+                if (appearances > 0) {
+                    double totalTime = System.currentTimeMillis() - time;
+                    mySearchInformation = new SearchInformation(arrayWord, webSite, firstLine, appearances, totalTime/1000);
                     arrayInformation.add(mySearchInformation);
                 }    
             }
-            
             ready = false;
         }
         
@@ -520,7 +475,6 @@ public class Browser extends javax.swing.JFrame {
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(Browser.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -546,7 +500,7 @@ public class Browser extends javax.swing.JFrame {
                 try {
                     ArrayList<SearchInformation> arrayInformation = goWebSites();
                     if(arrayInformation.size() > 0){
-                        showResults(arrayInformation);
+                        myFacilitator.showResults(arrayInformation);
                     }
                     else {
                         textAreaResults.setText("No results found.");
@@ -623,8 +577,8 @@ public class Browser extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel6;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTextArea textAreaPages;
-    private javax.swing.JTextArea textAreaResults;
-    private javax.swing.JTextField textSearch;
+    public javax.swing.JTextArea textAreaPages;
+    public javax.swing.JTextArea textAreaResults;
+    public javax.swing.JTextField textSearch;
     // End of variables declaration//GEN-END:variables
 }

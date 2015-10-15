@@ -14,9 +14,9 @@ public class SearchInformation {
     public String webSite;
     public String header;
     public int appearances;
-    public long time;
+    public double time;
 
-    public SearchInformation(String word, String webSite, String header, int appearances, long time) {
+    public SearchInformation(String word, String webSite, String header, int appearances, double time) {
         this.word = word;
         this.webSite = webSite;
         this.header = header;
