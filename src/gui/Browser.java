@@ -101,10 +101,12 @@ public class Browser extends javax.swing.JFrame {
         buttonParallel.setBackground(new java.awt.Color(0, 178, 118));
     }
     
+    public void setTextInTextResults(String text) {
+        textAreaResults.setText(text);
+    }
+    
     public void search() {
         if(!textSearch.getText().equals("") && !textAreaPages.getText().equals("")) {
-            textAreaResults.setText("");
-            
             if(buttonSequential.getBackground().getRed() == 0) { // Sequential
                 try {
                     ArrayList<String> arrayWords = myFacilitator.getWordsToSearch();
@@ -118,14 +120,13 @@ public class Browser extends javax.swing.JFrame {
                         myFacilitator.showResults(arrayInformation, totalTime);
                     }
                     else {
-                        textAreaResults.setText("<div style='font-family: Arial, Helvetica, sans-serif; font-size: 12px;'>No results found.</div>");
+                        setTextInTextResults("<div style='font-family: Arial, Helvetica, sans-serif; font-size: 12px;'>No results found.</div>");
                     }
                 } catch (IOException ex) {
                     Logger.getLogger(Browser.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            else 
-            { // Parallel
+            else { // Parallel
                 searchParallel search_parallel = new searchParallel(myFacilitator.getWordsToSearch(), myFacilitator.getWebSites());
                 
                 double time = System.currentTimeMillis();                
@@ -136,11 +137,14 @@ public class Browser extends javax.swing.JFrame {
                     myFacilitator.showResults(arrayInformation, totalTime);
                 }
                 else {
-                    textAreaResults.setText("<div style='font-family: Arial, Helvetica, sans-serif; font-size: 12px;'>No results found.</div>");
+                    setTextInTextResults("<div style='font-family: Arial, Helvetica, sans-serif; font-size: 12px;'>No results found.</div>");
                 }
             }
 
             buttonStatistics.setEnabled(true);
+        }
+        else {
+            setTextInTextResults("<div style='font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: red;'>Please enter web sites and words to search.</div>");
         }
     }
     
@@ -312,12 +316,13 @@ public class Browser extends javax.swing.JFrame {
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 600, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addGap(255, 255, 255)
-                .addComponent(jLabel4)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 600, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                        .addComponent(jLabel4)
+                        .addGap(257, 257, 257))))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

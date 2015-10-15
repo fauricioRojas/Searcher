@@ -61,7 +61,7 @@ public class Facilitator {
             result += "<div style='font-family: Arial, Helvetica, sans-serif; font-size: 11px;'>"+searchInformation.time + " seconds</div>";            
         }
         
-        this.myBrowser.textAreaResults.setText(result);
+        this.myBrowser.setTextInTextResults(result);
     }
     
     /**
