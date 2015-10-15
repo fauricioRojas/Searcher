@@ -10,12 +10,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
@@ -89,7 +84,7 @@ public class Browser extends javax.swing.JFrame {
             
             if(buttonSequential.getBackground().getRed() == 0) { // Sequential
                 try {
-                    ArrayList<SearchInformation> arrayInformation = this.mySequential.goWebSites();
+                    ArrayList<SearchInformation> arrayInformation = this.mySequential.searchSequential();
                     if(arrayInformation.size() > 0){
                         myFacilitator.showResults(arrayInformation);
                     }

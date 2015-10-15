@@ -30,7 +30,7 @@ public class searchSequential {
      * @return Array with information of the search in the web sites
      * @throws IOException 
      */
-    public ArrayList<SearchInformation> goWebSites() throws IOException {
+    public ArrayList<SearchInformation> searchSequential() throws IOException {
         // This array contains the words to search in the web sites
         ArrayList<String> arrayWords = this.myFacilitator.getWordsToSearch();
         // This array contains the information for show in the statistics
@@ -38,7 +38,7 @@ public class searchSequential {
         // This object contains the information
         SearchInformation mySearchInformation;
         
-        boolean ready = false;
+        boolean readyTitle = false;
         
         ArrayList<String> webSites = this.myFacilitator.getWebSites();
         for (String webSite : webSites) {
@@ -46,12 +46,13 @@ public class searchSequential {
             URLConnection uc = url.openConnection();
             uc.connect();
             BufferedReader in = new BufferedReader(new InputStreamReader(uc.getInputStream()));
-            String line, firstLine = "", content = "";
+            String line, title = "", content = "";
             while ((line = in.readLine()) != null) {
-                if(line.contains("<p>") && !ready) {
-                    firstLine = line;
-                    ready = true;
+                if(line.contains("<title>") && !readyTitle) {
+                    title = line.substring(line.indexOf("<title>")+7, line.indexOf("</title>"));;
+                    readyTitle = true;
                 }
+                
                 content += line;
             }
             in.close();
@@ -62,11 +63,12 @@ public class searchSequential {
                 int appearances = this.myFacilitator.getTotalAppearances(content, arrayWord);
                 if (appearances > 0) {
                     double totalTime = System.currentTimeMillis() - time;
-                    mySearchInformation = new SearchInformation(arrayWord, webSite, firstLine, appearances, totalTime/1000);
+                    
+                    mySearchInformation = new SearchInformation(arrayWord, webSite, title, appearances, totalTime/1000);
                     arrayInformation.add(mySearchInformation);
                 }    
             }
-            ready = false;
+            readyTitle = false;
         }
         
         return arrayInformation;

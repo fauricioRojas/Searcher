@@ -51,7 +51,7 @@ public class Facilitator {
                         
         for (SearchInformation searchInformation : arrayInformation) {
             this.myBrowser.textAreaResults.append("\n\n" + searchInformation.word + "\n");
-            this.myBrowser.textAreaResults.append(searchInformation.header + "\n");
+            this.myBrowser.textAreaResults.append(searchInformation.title + "\n");
             this.myBrowser.textAreaResults.append(searchInformation.webSite + "\n");
             this.myBrowser.textAreaResults.append(searchInformation.appearances + " appearances\n");
             this.myBrowser.textAreaResults.append(searchInformation.time + " seconds");
