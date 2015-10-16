@@ -5,37 +5,57 @@
  */
 package gui;
 
+import com.sun.management.OperatingSystemMXBean;
+import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Desktop;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.lang.management.ManagementFactory;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLConnection;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.management.AttributeList;
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanServer;
+import javax.management.MBeanServerConnection;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
+import javax.management.ReflectionException;
 import javax.swing.BorderFactory;
 import javax.swing.JFileChooser;
 import javax.swing.border.Border;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+import javax.xml.stream.events.Attribute;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 import searcher.Facilitator;
+import searcher.ExecutionInformation;
 import searcher.Parallel.searchParallel;
 import searcher.SearchInformation;
 import searcher.Sequential.searchSequential;
+import searcher.WordsInformation;
 
-/**
- *
- * @author fauricio
- */
+
 public class Browser extends javax.swing.JFrame {
     private Statistics myStatistics;
     private Facilitator myFacilitator;
     private searchSequential mySequential;
+          
+    private MBeanServerConnection mbsc;
     
     /**
      * Creates new form browser
@@ -47,23 +67,25 @@ public class Browser extends javax.swing.JFrame {
         this.myStatistics = new Statistics();
         this.mySequential = new searchSequential(myFacilitator);
         
+        this.mbsc = ManagementFactory.getPlatformMBeanServer();
+        
         setMargin();
         selectSequential();
         
         textAreaResults.setEditable(false);
-    textAreaResults.setContentType("text/html");
-    textAreaResults.addHyperlinkListener(new HyperlinkListener() {
-        @Override
-        public void hyperlinkUpdate(HyperlinkEvent e) {
-            if(e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                Desktop desktop = Desktop.getDesktop();
-                try {
-                    desktop.browse(e.getURL().toURI());
-                } catch (URISyntaxException | IOException ex) {
+        textAreaResults.setContentType("text/html");
+        textAreaResults.addHyperlinkListener(new HyperlinkListener() {
+            @Override
+            public void hyperlinkUpdate(HyperlinkEvent e) {
+                if(e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                    Desktop desktop = Desktop.getDesktop();
+                    try {
+                        desktop.browse(e.getURL().toURI());
+                    } catch (URISyntaxException | IOException ex) {
+                    }
                 }
             }
-        }
-    });
+        });      
     }
     
     /**
@@ -78,11 +100,7 @@ public class Browser extends javax.swing.JFrame {
         
         border = BorderFactory.createLineBorder(java.awt.Color.GRAY);
         textSearch.setBorder(BorderFactory.createCompoundBorder(border, 
-            BorderFactory.createEmptyBorder(0, 5, 0, 5)));
-        myStatistics.textExecutionType.setBorder(BorderFactory.createCompoundBorder(border, 
-            BorderFactory.createEmptyBorder(0, 5, 0, 5)));
-        myStatistics.textTotalTime.setBorder(BorderFactory.createCompoundBorder(border, 
-            BorderFactory.createEmptyBorder(0, 5, 0, 5)));
+            BorderFactory.createEmptyBorder(0, 5, 0, 5)));        
     }
     
     /**
@@ -104,20 +122,133 @@ public class Browser extends javax.swing.JFrame {
     public void setTextInTextResults(String text) {
         textAreaResults.setText(text);
     }
+           
+   private void createChartExecutionTime(double Sequential, double Parallel)
+   {   
+      final DefaultCategoryDataset dataset = new DefaultCategoryDataset( );
+      dataset.addValue( Sequential , "Sequential" , "" );
+      dataset.addValue( Parallel , "Parallel" , "" ); 
+      
+      JFreeChart barChart = ChartFactory.createBarChart("Execution's Time","Execution's Type","Time",dataset,PlotOrientation.VERTICAL, true, false, false);
+      
+      ChartPanel chartPanel = new ChartPanel( barChart );
+      myStatistics.container.remove(0);
+      myStatistics.container.add(chartPanel,"Execution's Time",0);
+      parallelTime = 0;
+      sequentialTime = 0;
+   }
+   
+   private void createChartUseCPU(long Sequential, long Parallel)
+   {   
+      final DefaultCategoryDataset dataset = new DefaultCategoryDataset( );
+      dataset.addValue( Sequential , "Sequential" , "" );
+      dataset.addValue( Parallel , "Parallel" , "" ); 
+      
+      JFreeChart barChart = ChartFactory.createBarChart("CPU Use Time","Execution's Type","Percents",dataset,PlotOrientation.VERTICAL, true, false, false);
+      
+      ChartPanel chartPanel = new ChartPanel( barChart );
+      myStatistics.container.remove(1);
+      myStatistics.container.add(chartPanel,"CPU Usage Time",1);
+      percentParallel = 0;
+      percentSequential = 0;
+   }
+   
+   private void createChartComparison()
+   { 
+      final XYSeries Sequential = new XYSeries( "Sequential" );
+      final XYSeries Parallel = new XYSeries( "Parallel" );
+      
+      for(ExecutionInformation info : ExecutionInformation.info)
+      {
+          if(info.type.equals("Sequential"))
+              Sequential.add(info.i,info.time);
+          else
+              Parallel.add(info.i,info.time);
+      } 
+      
+      final XYSeriesCollection dataset = new XYSeriesCollection( );          
+      dataset.addSeries( Sequential );          
+      dataset.addSeries( Parallel );    
+      
+      JFreeChart xylineChart = ChartFactory.createXYLineChart(
+         "Comparison" ,
+         "Execution's Number" ,
+         "Time" ,
+         dataset ,
+         PlotOrientation.VERTICAL ,
+         true , true , false);
+         
+      ChartPanel chartPanel = new ChartPanel( xylineChart );
+      
+      final XYPlot plot = xylineChart.getXYPlot( );
+      XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer( );
+      renderer.setSeriesPaint( 0 , Color.RED );
+      renderer.setSeriesPaint( 1 , Color.BLUE );
+      
+      renderer.setSeriesStroke( 0 , new BasicStroke( 3.0f ) );
+      renderer.setSeriesStroke( 1 , new BasicStroke( 3.0f ) );
+      plot.setRenderer( renderer ); 
+      
+      myStatistics.container.remove(2);
+      myStatistics.container.add(chartPanel,"Comparison",2);
+   }
+   
+   private void createChartAppearances()
+   {   
+      final DefaultCategoryDataset dataset = new DefaultCategoryDataset( );
+      
+      for(WordsInformation info : WordsInformation.info)
+      {
+          dataset.addValue(info.i, "", info.word);
+      }
+      JFreeChart barChart = ChartFactory.createBarChart("Appearances","Words","Appearances",dataset,PlotOrientation.VERTICAL, false, false, false);
+      
+      ChartPanel chartPanel = new ChartPanel( barChart );
+      myStatistics.container.remove(3);
+      myStatistics.container.add(chartPanel,"Appearances",3);
+   }
+   
+    private double sequentialTime = 0;
+    private double parallelTime = 0;
+    private int consecutiveParallel = 0;
+    private int consecutiveSequential = 0;
+    long percentSequential = 0;
+    long percentParallel = 0;
     
-    public void search() {
-        if(!textSearch.getText().equals("") && !textAreaPages.getText().equals("")) {
+    public void search() throws IOException {
+        if(!textSearch.getText().equals("") && !textAreaPages.getText().equals("")) {      
+            WordsInformation.info.clear();
             if(buttonSequential.getBackground().getRed() == 0) { // Sequential
+                consecutiveSequential++;
                 try {
                     ArrayList<String> arrayWords = myFacilitator.getWordsToSearch();
                     ArrayList<String> webSites = myFacilitator.getWebSites();
                     
+                    OperatingSystemMXBean osMBean = ManagementFactory.newPlatformMXBeanProxy(mbsc, ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, OperatingSystemMXBean.class);
+                    long nanoBefore = System.nanoTime();
+                    long cpuBefore = osMBean.getProcessCpuTime();
+                
                     double time = System.currentTimeMillis();
                     ArrayList<SearchInformation> arrayInformation = this.mySequential.searchSequential(arrayWords, webSites);
                     double totalTime = (System.currentTimeMillis() - time)/1000;
                     
+                    long cpuAfter = osMBean.getProcessCpuTime();
+                    long nanoAfter = System.nanoTime();
+
+                    
+                    if (nanoAfter > nanoBefore)
+                     percentSequential = ((cpuAfter-cpuBefore)*100L)/(nanoAfter-nanoBefore);
+                    else 
+                        percentSequential = 0;
+                    
                     if(arrayInformation.size() > 0){
-                        myFacilitator.showResults(arrayInformation, totalTime);
+                        myFacilitator.showResults(arrayInformation, totalTime,false,consecutiveSequential);
+                        sequentialTime = totalTime;
+                        if(parallelTime != 0)
+                        {
+                            createChartExecutionTime(sequentialTime, parallelTime);
+                            createChartUseCPU(percentSequential, percentParallel);
+                        }
                     }
                     else {
                         setTextInTextResults("<div style='font-family: Arial, Helvetica, sans-serif; font-size: 12px;'>No results found.</div>");
@@ -127,21 +258,38 @@ public class Browser extends javax.swing.JFrame {
                 }
             }
             else { // Parallel
+                consecutiveParallel++;
                 searchParallel search_parallel = new searchParallel(myFacilitator.getWordsToSearch(), myFacilitator.getWebSites());
+                
+                OperatingSystemMXBean osMBean = ManagementFactory.newPlatformMXBeanProxy(mbsc, ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, OperatingSystemMXBean.class);
+                long nanoBefore = System.nanoTime();
+                long cpuBefore = osMBean.getProcessCpuTime();
                 
                 double time = System.currentTimeMillis();                
                 ArrayList<SearchInformation> arrayInformation = search_parallel.search();
                 double totalTime = (System.currentTimeMillis() - time)/1000;
                 
+                long cpuAfter = osMBean.getProcessCpuTime();
+                long nanoAfter = System.nanoTime();
+                
+                if (nanoAfter > nanoBefore)
+                    percentParallel = ((cpuAfter-cpuBefore)*100L)/(nanoAfter-nanoBefore);
+                else 
+                    percentParallel = 0;
+                
                 if(arrayInformation.size() > 0){
-                    myFacilitator.showResults(arrayInformation, totalTime);
+                    myFacilitator.showResults(arrayInformation, totalTime,true,consecutiveParallel);
+                    parallelTime = totalTime;
+                    if(sequentialTime != 0)
+                    {
+                        createChartExecutionTime(sequentialTime, parallelTime);   
+                        createChartUseCPU(percentSequential, percentParallel);
+                    }
                 }
                 else {
                     setTextInTextResults("<div style='font-family: Arial, Helvetica, sans-serif; font-size: 12px;'>No results found.</div>");
-                }
-            }
-
-            buttonStatistics.setEnabled(true);
+                }    
+            }            
         }
         else {
             setTextInTextResults("<div style='font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: red;'>Please enter web sites and words to search.</div>");
@@ -279,7 +427,6 @@ public class Browser extends javax.swing.JFrame {
                         .addComponent(jScrollPane1)
                         .addContainerGap())
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -365,7 +512,6 @@ public class Browser extends javax.swing.JFrame {
         buttonStatistics.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         buttonStatistics.setText("See statistics");
         buttonStatistics.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        buttonStatistics.setEnabled(false);
         buttonStatistics.setPreferredSize(new java.awt.Dimension(150, 30));
         buttonStatistics.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -503,25 +649,35 @@ public class Browser extends javax.swing.JFrame {
 
     private void buttonSequentialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSequentialActionPerformed
         selectSequential();
-        myStatistics.textExecutionType.setText("Sequential");
+       
     }//GEN-LAST:event_buttonSequentialActionPerformed
 
     private void buttonParallelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonParallelActionPerformed
         selectParallel();
-        myStatistics.textExecutionType.setText("Parallel");
+        
     }//GEN-LAST:event_buttonParallelActionPerformed
 
     private void buttonSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSearchActionPerformed
-        search();
+        try {
+            search();
+        } catch (IOException ex) {
+            Logger.getLogger(Browser.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_buttonSearchActionPerformed
 
     private void buttonStatisticsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonStatisticsActionPerformed
+        createChartComparison();
+        createChartAppearances();
         myStatistics.setVisible(true);
     }//GEN-LAST:event_buttonStatisticsActionPerformed
 
     private void textSearchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_textSearchKeyTyped
         if(evt.getKeyChar() == '\n'){
-            search();
+            try {
+                search();
+            } catch (IOException ex) {
+                Logger.getLogger(Browser.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }//GEN-LAST:event_textSearchKeyTyped
 

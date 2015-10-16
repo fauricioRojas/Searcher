@@ -7,15 +7,9 @@ package searcher;
 
 import gui.Browser;
 
-/**
- *
- * @author fauricio
- */
+
 public class Searcher {
 
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String[] args) {
         Browser myBrowser = new Browser();
         myBrowser.setVisible(true);

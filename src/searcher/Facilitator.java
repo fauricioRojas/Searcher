@@ -11,10 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.StringTokenizer;
 
-/**
- *
- * @author fauricio
- */
+
 public class Facilitator {
     private Browser myBrowser;
 
@@ -47,11 +44,14 @@ public class Facilitator {
      * @param arrayInformation Array with the information of the search
      * @param totalTime Total time of the search
      */
-    public void showResults(ArrayList<SearchInformation> arrayInformation, double totalTime) 
+    public void showResults(ArrayList<SearchInformation> arrayInformation, double totalTime, boolean type, int i) 
     {        
         String result = "<div style='font-family: Arial, Helvetica, sans-serif; font-size: 12px;'>"+arrayInformation.size() + " results found (" + totalTime + " seconds)</div>";
         
         for (SearchInformation searchInformation : arrayInformation) {
+           
+            WordsInformation.add(searchInformation.word,searchInformation.appearances);
+            
             result += "<br><hr><br>";
             result += "<strong style='font-family: Arial; font-size: 13px;'>"+searchInformation.title+"</strong>";
             result += "<br>";
@@ -59,8 +59,12 @@ public class Facilitator {
             result += "<br>";
             result += "<div style='font-family: Arial, Helvetica, sans-serif; font-size: 11px;'>"+searchInformation.appearances + " appearances of <strong>"+searchInformation.word+"</strong></div>";
             result += "<div style='font-family: Arial, Helvetica, sans-serif; font-size: 11px;'>"+searchInformation.time + " seconds</div>";            
-        }
+        }       
         
+        if(!type)
+            ExecutionInformation.info.add(new ExecutionInformation("Sequential", totalTime, i));
+        else
+            ExecutionInformation.info.add(new ExecutionInformation("Parrallel", totalTime, i));
         this.myBrowser.setTextInTextResults(result);
     }
     

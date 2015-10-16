@@ -14,10 +14,7 @@ import java.util.ArrayList;
 import searcher.Facilitator;
 import searcher.SearchInformation;
 
-/**
- *
- * @author Kenneth Pérez
- */
+
 public class searchSequential {
     private Facilitator myFacilitator;
 

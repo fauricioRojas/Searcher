@@ -16,10 +16,7 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 import searcher.SearchInformation;
 
-/**
- *
- * @author Kenneth Pérez
- */
+
 public class searchParallel 
 {
     // This array contains the words to search in the web sites

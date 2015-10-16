@@ -5,10 +5,7 @@
  */
 package searcher;
 
-/**
- *
- * @author fauricio
- */
+
 public class SearchInformation {
     public String word;
     public String webSite;
