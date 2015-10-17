@@ -60,6 +60,8 @@ public class searchParallel
     {        
         StringBuffer page = null;
         String title = "";
+        Document document = null;
+        
         try 
         { 
             URL url = new URL(MyURL);
@@ -75,7 +77,7 @@ public class searchParallel
             String text = builder.toString(); 
             page = new StringBuffer(text); 
             
-            Document document = Jsoup.connect(MyURL).get();
+            document = Jsoup.connect(MyURL).get();
             title = document.title();
         }
         catch (Exception e){}
@@ -90,7 +92,7 @@ public class searchParallel
         
         if(occurrences != 0)
         {
-            return new SearchInformation(word, MyURL, title, occurrences, end);
+            return new SearchInformation(word, MyURL, title, document.text().substring(0, 150) + "...", occurrences, end);
         } 
         return null;      
     }
