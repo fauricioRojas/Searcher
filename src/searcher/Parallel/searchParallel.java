@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import searcher.SearchInformation;
 
 
@@ -66,17 +68,15 @@ public class searchParallel
             
             BufferedReader in = new BufferedReader(new InputStreamReader(uc.getInputStream())); 
             StringBuilder builder = new StringBuilder(); 
-            String line = "";
-            boolean readyTitle = false;
+            String line;
             while ((line = in.readLine()) != null) {
-                if(line.contains("<title>") && !readyTitle) {
-                    title = line.substring(line.indexOf("<title>")+7, line.indexOf("</title>"));
-                    readyTitle = true;
-                }
                 builder.append(line);
             } 
             String text = builder.toString(); 
             page = new StringBuffer(text); 
+            
+            Document document = Jsoup.connect(MyURL).get();
+            title = document.title();
         }
         catch (Exception e){}
         
