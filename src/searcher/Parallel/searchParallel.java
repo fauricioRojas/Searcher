@@ -90,7 +90,7 @@ public class searchParallel
         
         if(occurrences != 0)
         {
-            return new SearchInformation(word, MyURL, title,occurrences, end);
+            return new SearchInformation(word, MyURL, title, occurrences, end);
         } 
         return null;      
     }
@@ -113,18 +113,18 @@ public class searchParallel
         }
         
         public int getTotalAppearances(String content, String word) {
-        int appearances = 0;
-        
-        StringTokenizer wordsContent = new StringTokenizer(content, " \n<>&¿?@=¡!|^{}[]*~'&%#\";:/-_°¬+,.\\()");
-        
-        while(wordsContent.hasMoreTokens()){
-            if(wordsContent.nextToken().equals(word)) {
-                appearances++;
+            int appearances = 0;
+
+            StringTokenizer wordsContent = new StringTokenizer(content, " \n<>&¿?@=¡!|^{}[]*~'&%#\";:/-_°¬+,.\\()");
+
+            while(wordsContent.hasMoreTokens()){
+                if(wordsContent.nextToken().equals(word)) {
+                    appearances++;
+                }
             }
-        }
         
-        return appearances;
-    }
+            return appearances;
+        }
 
         @Override
         protected Integer compute() 

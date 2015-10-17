@@ -7,9 +7,12 @@
 package searcher;
 
 import gui.Browser;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.StringTokenizer;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 
 public class Facilitator {
@@ -57,6 +60,7 @@ public class Facilitator {
             result += "<br>";
             result += "<a style='font-family: Arial, Helvetica, sans-serif; font-size: 11px;' href='"+searchInformation.webSite+"'>"+searchInformation.webSite+"</a>";
             result += "<br>";
+            result += "<i style='font-family: Arial, Helvetica, sans-serif; font-size: 11px;'>"+searchInformation.paragraph + "</i>";
             result += "<div style='font-family: Arial, Helvetica, sans-serif; font-size: 11px;'>"+searchInformation.appearances + " appearances of <strong>"+searchInformation.word+"</strong></div>";
             result += "<div style='font-family: Arial, Helvetica, sans-serif; font-size: 11px;'>"+searchInformation.time + " seconds</div>";            
         }       
@@ -101,5 +105,19 @@ public class Facilitator {
         webSites.addAll(Arrays.asList(result));
         
         return webSites;
+    }
+    
+    /**
+     * This method get a paragraph of the web site
+     * @param webSite Web site in which to search
+     * @param word Word to search
+     * @return Paragraph of the web site
+     * @throws IOException 
+     */
+    public String getParagraph(String webSite, String word) throws IOException {
+        Document document = Jsoup.connect(webSite).get();
+        String paragraph = document.text();
+        
+        return(paragraph.substring(0, 150) + "...");
     }
 }

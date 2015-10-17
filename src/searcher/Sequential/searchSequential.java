@@ -24,6 +24,8 @@ public class searchSequential {
     
     /**
      * This method get the content for a web sites and search if a word exists in the content of the web site
+     * @param arrayWords Array with the words to search
+     * @param webSites Web sites in which search
      * @return Array with information of the search in the web sites
      * @throws IOException 
      */
@@ -53,12 +55,12 @@ public class searchSequential {
             
             double time = System.currentTimeMillis();
             
-            for (String arrayWord : arrayWords) {
-                int appearances = this.myFacilitator.getTotalAppearances(content, arrayWord);
+            for (String word : arrayWords) {
+                int appearances = this.myFacilitator.getTotalAppearances(content, word);
                 if (appearances > 0) {
                     double totalTime = (System.currentTimeMillis() - time)/1000;
                     
-                    mySearchInformation = new SearchInformation(arrayWord, webSite, title, appearances, totalTime);
+                    mySearchInformation = new SearchInformation(word, webSite, title, myFacilitator.getParagraph(webSite, word), appearances, totalTime);
                     arrayInformation.add(mySearchInformation);
                 }    
             }
