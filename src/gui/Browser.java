@@ -36,7 +36,6 @@ import searcher.SearchInformation;
 import searcher.Sequential.searchSequential;
 import searcher.WordsInformation;
 
-
 public class Browser extends javax.swing.JFrame {
     private Statistics myStatistics;
     private Facilitator myFacilitator;
@@ -58,21 +57,7 @@ public class Browser extends javax.swing.JFrame {
         
         setMargin();
         selectSequential();
-        
-        textAreaResults.setEditable(false);
-        textAreaResults.setContentType("text/html");
-        textAreaResults.addHyperlinkListener(new HyperlinkListener() {
-            @Override
-            public void hyperlinkUpdate(HyperlinkEvent e) {
-                if(e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                    Desktop desktop = Desktop.getDesktop();
-                    try {
-                        desktop.browse(e.getURL().toURI());
-                    } catch (URISyntaxException | IOException ex) {
-                    }
-                }
-            }
-        });      
+        setHyperlinkInTextResults();
     }
     
     /**
@@ -96,6 +81,25 @@ public class Browser extends javax.swing.JFrame {
     public void selectSequential() {
         buttonSequential.setBackground(new java.awt.Color(0, 178, 118));
         buttonParallel.setBackground(new java.awt.Color(231, 76, 60));
+    }
+    
+    /**
+     * This method set the hyperlink to the web site in the text result
+     */
+    public void setHyperlinkInTextResults() {
+        //textAreaResults.setContentType("text/html");
+        textAreaResults.addHyperlinkListener(new HyperlinkListener() {
+            @Override
+            public void hyperlinkUpdate(HyperlinkEvent e) {
+                if(e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                    Desktop desktop = Desktop.getDesktop();
+                    try {
+                        desktop.browse(e.getURL().toURI());
+                    } catch (URISyntaxException | IOException ex) {
+                    }
+                }
+            }
+        });  
     }
     
     /**
@@ -443,6 +447,8 @@ public class Browser extends javax.swing.JFrame {
         jLabel4.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         jLabel4.setText("Search results");
 
+        textAreaResults.setEditable(false);
+        textAreaResults.setContentType("text/html"); // NOI18N
         textAreaResults.setPreferredSize(new java.awt.Dimension(600, 447));
         jScrollPane3.setViewportView(textAreaResults);
 

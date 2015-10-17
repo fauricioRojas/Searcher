@@ -24,15 +24,15 @@ public class Facilitator {
      */
     public int getTotalAppearances(String content, String word) {
         int appearances = 0;
-        
+
         StringTokenizer wordsContent = new StringTokenizer(content, " \n<>&¿?@=¡!|^{}[]*~'&%#\";:/-_°¬+,.\\()");
-        
+
         while(wordsContent.hasMoreTokens()){
             if(wordsContent.nextToken().equals(word)) {
                 appearances++;
             }
         }
-        
+
         return appearances;
     }
     
