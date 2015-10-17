@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package searcher;
 
 import gui.Browser;
@@ -119,5 +113,5 @@ public class Facilitator {
         String paragraph = document.text();
         
         return(paragraph.substring(0, 150) + "...");
-    }
+    } 
 }
