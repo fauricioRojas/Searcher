@@ -44,9 +44,10 @@ public class SearchSequential {
             Document document = Jsoup.connect(webSite).get();
             title = document.title();
             
-            double time = System.currentTimeMillis();
+            double time;
             
             for (String word : arrayWords) {
+                time = System.currentTimeMillis();
                 int appearances = this.myFacilitator.getTotalAppearances(content, word);
                 if (appearances > 0) {
                     double totalTime = (System.currentTimeMillis() - time)/1000;
