@@ -74,8 +74,7 @@ public class searchParallel
             
             document = Jsoup.connect(MyURL).get();
             title = document.title();
-        }
-        catch (Exception e){}
+        }catch (Exception e){}
         
         double start = System.currentTimeMillis();
         
@@ -252,5 +251,3 @@ public class searchParallel
         }    
     }
 }
-
-

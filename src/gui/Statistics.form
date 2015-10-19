@@ -135,8 +135,8 @@
             <Container class="javax.swing.JTabbedPane" name="jTabbedPane1">
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                  <JTabbedPaneConstraints tabName="Execution&apos;s Time">
-                    <Property name="tabTitle" type="java.lang.String" value="Execution&apos;s Time"/>
+                  <JTabbedPaneConstraints tabName="Execution&apos;s time">
+                    <Property name="tabTitle" type="java.lang.String" value="Execution&apos;s time"/>
                   </JTabbedPaneConstraints>
                 </Constraint>
               </Constraints>
@@ -146,8 +146,8 @@
             <Container class="javax.swing.JTabbedPane" name="jTabbedPane2">
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                  <JTabbedPaneConstraints tabName="CPU Usage Time">
-                    <Property name="tabTitle" type="java.lang.String" value="CPU Usage Time"/>
+                  <JTabbedPaneConstraints tabName="CPU usage time">
+                    <Property name="tabTitle" type="java.lang.String" value="CPU usage time"/>
                   </JTabbedPaneConstraints>
                 </Constraint>
               </Constraints>

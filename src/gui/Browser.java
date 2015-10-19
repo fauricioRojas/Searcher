@@ -87,7 +87,6 @@ public class Browser extends javax.swing.JFrame {
      * This method set the hyperlink to the web site in the text result
      */
     public void setHyperlinkInTextResults() {
-        //textAreaResults.setContentType("text/html");
         textAreaResults.addHyperlinkListener(new HyperlinkListener() {
             @Override
             public void hyperlinkUpdate(HyperlinkEvent e) {
@@ -110,94 +109,96 @@ public class Browser extends javax.swing.JFrame {
         buttonParallel.setBackground(new java.awt.Color(0, 178, 118));
     }
     
+    /**
+     * This method set a text in textResults
+     * @param text Text to set in textResults
+     */
     public void setTextInTextResults(String text) {
         textAreaResults.setText(text);
     }
            
-   private void createChartExecutionTime(double Sequential, double Parallel)
-   {   
-      final DefaultCategoryDataset dataset = new DefaultCategoryDataset( );
-      dataset.addValue( Sequential , "Sequential" , "" );
-      dataset.addValue( Parallel , "Parallel" , "" ); 
-      
-      JFreeChart barChart = ChartFactory.createBarChart("Execution's Time","Execution's Type","Time",dataset,PlotOrientation.VERTICAL, true, false, false);
-      
-      ChartPanel chartPanel = new ChartPanel( barChart );
-      myStatistics.container.remove(0);
-      myStatistics.container.add(chartPanel,"Execution's Time",0);
-      parallelTime = 0;
-      sequentialTime = 0;
-   }
+    private void createChartExecutionTime(double Sequential, double Parallel)
+    {   
+        final DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        dataset.addValue(Sequential , "Sequential" , "");
+        dataset.addValue(Parallel , "Parallel" , ""); 
+
+        JFreeChart barChart = ChartFactory.createBarChart("Execution's time","Execution's type",
+                "Time",dataset,PlotOrientation.VERTICAL, true, false, false);
+
+        ChartPanel chartPanel = new ChartPanel(barChart);
+        myStatistics.container.remove(0);
+        myStatistics.container.add(chartPanel,"Execution's time",0);
+        parallelTime = 0;
+        sequentialTime = 0;
+    }
    
-   private void createChartUseCPU(long Sequential, long Parallel)
-   {   
-      final DefaultCategoryDataset dataset = new DefaultCategoryDataset( );
-      dataset.addValue( Sequential , "Sequential" , "" );
-      dataset.addValue( Parallel , "Parallel" , "" ); 
-      
-      JFreeChart barChart = ChartFactory.createBarChart("CPU Use Time","Execution's Type","Percents",dataset,PlotOrientation.VERTICAL, true, false, false);
-      
-      ChartPanel chartPanel = new ChartPanel( barChart );
-      myStatistics.container.remove(1);
-      myStatistics.container.add(chartPanel,"CPU Usage Time",1);
-      percentParallel = 0;
-      percentSequential = 0;
-   }
+    private void createChartUseCPU(long Sequential, long Parallel)
+    {   
+        final DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        dataset.addValue(Sequential , "Sequential" , "");
+        dataset.addValue(Parallel , "Parallel" , ""); 
+
+        JFreeChart barChart = ChartFactory.createBarChart("CPU use time","Execution's type",
+                "Percents",dataset,PlotOrientation.VERTICAL, true, false, false);
+
+        ChartPanel chartPanel = new ChartPanel(barChart);
+        myStatistics.container.remove(1);
+        myStatistics.container.add(chartPanel,"CPU usage time",1);
+        percentParallel = 0;
+        percentSequential = 0;
+    }
    
-   private void createChartComparison()
-   { 
-      final XYSeries Sequential = new XYSeries( "Sequential" );
-      final XYSeries Parallel = new XYSeries( "Parallel" );
-      
-      for(ExecutionInformation info : ExecutionInformation.info)
-      {
-          if(info.type.equals("Sequential"))
-              Sequential.add(info.i,info.time);
-          else
-              Parallel.add(info.i,info.time);
-      } 
-      
-      final XYSeriesCollection dataset = new XYSeriesCollection( );          
-      dataset.addSeries( Sequential );          
-      dataset.addSeries( Parallel );    
-      
-      JFreeChart xylineChart = ChartFactory.createXYLineChart(
-         "Comparison" ,
-         "Execution's Number" ,
-         "Time" ,
-         dataset ,
-         PlotOrientation.VERTICAL ,
-         true , true , false);
-         
-      ChartPanel chartPanel = new ChartPanel( xylineChart );
-      
-      final XYPlot plot = xylineChart.getXYPlot( );
-      XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer( );
-      renderer.setSeriesPaint( 0 , Color.RED );
-      renderer.setSeriesPaint( 1 , Color.BLUE );
-      
-      renderer.setSeriesStroke( 0 , new BasicStroke( 3.0f ) );
-      renderer.setSeriesStroke( 1 , new BasicStroke( 3.0f ) );
-      plot.setRenderer( renderer ); 
-      
-      myStatistics.container.remove(2);
-      myStatistics.container.add(chartPanel,"Comparison",2);
-   }
+    private void createChartComparison()
+    { 
+        final XYSeries Sequential = new XYSeries("Sequential");
+        final XYSeries Parallel = new XYSeries("Parallel");
+
+        for(ExecutionInformation info : ExecutionInformation.info)
+        {
+            if(info.type.equals("Sequential"))
+                Sequential.add(info.i,info.time);
+            else
+                Parallel.add(info.i,info.time);
+        } 
+
+        final XYSeriesCollection dataset = new XYSeriesCollection();          
+        dataset.addSeries( Sequential );          
+        dataset.addSeries( Parallel );    
+
+        JFreeChart xylineChart = ChartFactory.createXYLineChart("Comparison","Execution's number",
+                "Time",dataset,PlotOrientation.VERTICAL,true , true , false);
+
+        ChartPanel chartPanel = new ChartPanel(xylineChart);
+
+        final XYPlot plot = xylineChart.getXYPlot();
+        XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
+        renderer.setSeriesPaint(0 , Color.RED);
+        renderer.setSeriesPaint(1 , Color.BLUE);
+
+        renderer.setSeriesStroke(0 , new BasicStroke(3.0f));
+        renderer.setSeriesStroke(1 , new BasicStroke(3.0f));
+        plot.setRenderer(renderer); 
+
+        myStatistics.container.remove(2);
+        myStatistics.container.add(chartPanel,"Comparison",2);
+    }
    
-   private void createChartAppearances()
-   {   
-      final DefaultCategoryDataset dataset = new DefaultCategoryDataset( );
-      
-      for(WordsInformation info : WordsInformation.info)
-      {
-          dataset.addValue(info.i, "", info.word);
-      }
-      JFreeChart barChart = ChartFactory.createBarChart("Appearances","Words","Appearances",dataset,PlotOrientation.VERTICAL, false, false, false);
-      
-      ChartPanel chartPanel = new ChartPanel( barChart );
-      myStatistics.container.remove(3);
-      myStatistics.container.add(chartPanel,"Appearances",3);
-   }
+    private void createChartAppearances()
+    {   
+        final DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+        for(WordsInformation info : WordsInformation.info)
+        {
+            dataset.addValue(info.i, "", info.word);
+        }
+        JFreeChart barChart = ChartFactory.createBarChart("Appearances","Words","Appearances",
+                dataset,PlotOrientation.VERTICAL, false, false, false);
+
+        ChartPanel chartPanel = new ChartPanel(barChart);
+        myStatistics.container.remove(3);
+        myStatistics.container.add(chartPanel,"Appearances",3);
+    }
    
     private double sequentialTime = 0;
     private double parallelTime = 0;
@@ -206,6 +207,10 @@ public class Browser extends javax.swing.JFrame {
     long percentSequential = 0;
     long percentParallel = 0;
     
+    /**
+     * This method is the principal, handles of call the others methods necessary to the search
+     * @throws IOException 
+     */
     public void search() throws IOException {
         if(!textSearch.getText().equals("") && !textAreaPages.getText().equals("")) {      
             WordsInformation.info.clear();
@@ -610,19 +615,17 @@ public class Browser extends javax.swing.JFrame {
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
             
-            String line, pages;
-            FileReader f;
+            String line;
+            FileReader file;
             try {
-                f = new FileReader(selectedFile);
-                BufferedReader b = new BufferedReader(f);
+                file = new FileReader(selectedFile);
+                BufferedReader b = new BufferedReader(file);
                 try {
                     while((line = b.readLine())!=null) {
-                        pages = textAreaPages.getText();
-                        
-                        if(pages.equals(""))
-                            textAreaPages.setText(textAreaPages.getText() + line);
+                        if(textAreaPages.getText().equals(""))
+                            textAreaPages.append(line);
                         else
-                            textAreaPages.setText(textAreaPages.getText() + "\n" + line);
+                            textAreaPages.append("\n" + line);
                     }
                 } catch (IOException ex) {
                     Logger.getLogger(Browser.class.getName()).log(Level.SEVERE, null, ex);
@@ -644,12 +647,10 @@ public class Browser extends javax.swing.JFrame {
 
     private void buttonSequentialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSequentialActionPerformed
         selectSequential();
-       
     }//GEN-LAST:event_buttonSequentialActionPerformed
 
     private void buttonParallelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonParallelActionPerformed
         selectParallel();
-        
     }//GEN-LAST:event_buttonParallelActionPerformed
 
     private void buttonSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSearchActionPerformed

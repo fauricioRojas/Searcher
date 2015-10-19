@@ -51,7 +51,7 @@ public class searchSequential {
                 if (appearances > 0) {
                     double totalTime = (System.currentTimeMillis() - time)/1000;
                     
-                    arrayInformation.add(new SearchInformation(word, webSite, title, myFacilitator.getParagraph(webSite, word), appearances, totalTime));
+                    arrayInformation.add(new SearchInformation(word, webSite, title, myFacilitator.getParagraph(webSite), appearances, totalTime));
                 }    
             }
         }

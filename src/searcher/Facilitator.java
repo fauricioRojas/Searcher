@@ -106,11 +106,10 @@ public class Facilitator {
     /**
      * This method get a paragraph of the web site
      * @param webSite Web site in which to search
-     * @param word Word to search
      * @return Paragraph of the web site
      * @throws IOException 
      */
-    public String getParagraph(String webSite, String word) throws IOException {
+    public String getParagraph(String webSite) throws IOException {
         Document document = Jsoup.connect(webSite).get();
         String paragraph = document.text();
         

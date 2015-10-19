@@ -61,8 +61,8 @@ public class Statistics extends javax.swing.JFrame {
             .addGap(0, 0, Short.MAX_VALUE)
         );
 
-        container.addTab("Execution's Time", jTabbedPane1);
-        container.addTab("CPU Usage Time", jTabbedPane2);
+        container.addTab("Execution's time", jTabbedPane1);
+        container.addTab("CPU usage time", jTabbedPane2);
         container.addTab("Comparision", jTabbedPane3);
         container.addTab("Appearances", jTabbedPane4);
 
