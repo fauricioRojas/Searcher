@@ -14,7 +14,7 @@ import org.jsoup.nodes.Document;
 import searcher.SearchInformation;
 
 
-public class searchParallel 
+public class SearchParallel 
 {
     // This array contains the words to search in the web sites
     ArrayList<String> arrayWords;
@@ -27,7 +27,7 @@ public class searchParallel
      * @param Words Words to search in the web sites
      * @param URLs URLs for search
      */
-    public searchParallel(ArrayList<String> Words, ArrayList<String> URLs)
+    public SearchParallel(ArrayList<String> Words, ArrayList<String> URLs)
     {
         this.arrayWords = Words;
         this.arrayURLs = URLs;

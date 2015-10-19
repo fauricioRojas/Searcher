@@ -11,10 +11,10 @@ import org.jsoup.nodes.Document;
 import searcher.Facilitator;
 import searcher.SearchInformation;
 
-public class searchSequential {
+public class SearchSequential {
     private Facilitator myFacilitator;
 
-    public searchSequential(Facilitator myFacilitator) {
+    public SearchSequential(Facilitator myFacilitator) {
         this.myFacilitator = myFacilitator;
     }
     

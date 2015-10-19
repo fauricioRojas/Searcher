@@ -31,15 +31,15 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import searcher.Facilitator;
 import searcher.ExecutionInformation;
-import searcher.Parallel.searchParallel;
+import searcher.Parallel.SearchParallel;
 import searcher.SearchInformation;
-import searcher.Sequential.searchSequential;
+import searcher.Sequential.SearchSequential;
 import searcher.WordsInformation;
 
 public class Browser extends javax.swing.JFrame {
     private Statistics myStatistics;
     private Facilitator myFacilitator;
-    private searchSequential mySequential;
+    private SearchSequential mySequential;
           
     private MBeanServerConnection mbsc;
     
@@ -51,7 +51,7 @@ public class Browser extends javax.swing.JFrame {
         setLocationRelativeTo(null);
         this.myFacilitator = new Facilitator(this);
         this.myStatistics = new Statistics();
-        this.mySequential = new searchSequential(myFacilitator);
+        this.mySequential = new SearchSequential(myFacilitator);
         
         this.mbsc = ManagementFactory.getPlatformMBeanServer();
         
@@ -255,7 +255,7 @@ public class Browser extends javax.swing.JFrame {
             }
             else { // Parallel
                 consecutiveParallel++;
-                searchParallel search_parallel = new searchParallel(myFacilitator.getWordsToSearch(), myFacilitator.getWebSites());
+                SearchParallel search_parallel = new SearchParallel(myFacilitator.getWordsToSearch(), myFacilitator.getWebSites());
                 
                 OperatingSystemMXBean osMBean = ManagementFactory.newPlatformMXBeanProxy(mbsc, ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, OperatingSystemMXBean.class);
                 long nanoBefore = System.nanoTime();
