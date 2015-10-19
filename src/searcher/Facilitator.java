@@ -40,6 +40,8 @@ public class Facilitator {
      * This method shows the results of the search
      * @param arrayInformation Array with the information of the search
      * @param totalTime Total time of the search
+     * @param type Execution's type
+     * @param i 
      */
     public void showResults(ArrayList<SearchInformation> arrayInformation, double totalTime, boolean type, int i) 
     {        
